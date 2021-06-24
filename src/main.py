@@ -4,8 +4,9 @@ import pathlib
 
 videoCapture = cv2.VideoCapture(0)
 
-faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+#faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 eyesCascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+smileCascade = cv2.CascadeClassifier('haarcascade_smile.xml')
 
 faces = []
 labels = []
@@ -60,13 +61,14 @@ while rval:
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    facesz = faceCascade.detectMultiScale(gray, 1.3, 5)
-    faces2 = eyesCascade.detectMultiScale(gray, 1.3, 1)
+    #facesz = faceCascade.detectMultiScale(gray, 1.3, 5)
+    facesz = smileCascade.detectMultiScale(gray, 1.3, 80)
+    faces2 = eyesCascade.detectMultiScale(gray, 1.3, 3)
 
     for (x, y, w, h) in facesz:
         for (x2, y2, w2, h2) in faces2:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 2)
-            cv2.rectangle(frame, (x2, y2), (x2+w2, y2+h2), (255, 0, 255), 2)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            cv2.rectangle(frame, (x2, y2), (x2+w2, y2+h2), (0, 255, 0), 2)
 
             r_gr = gray[y:y+h, x:x+w]
             r_gr2 = gray[y2:y2+h2, x2:x2+w2]
@@ -74,9 +76,12 @@ while rval:
             lb, indice = faceRecognizer.predict(r_gr)
             lb2, indice2 = faceRecognizer.predict(r_gr2)
 
-            if indice < 80 and indice2 < 120:
+            print(f'1:{indice}')
+            print(f'2:{indice2}')
+
+            if indice < 10 and indice2 < 200:
                 label_text = subjects[lb]
-            elif indice > 80 and indice2 < 120:
+            elif indice2 > 200 and indice < 10:
                 label_text = subjects[lb2]
             else:
                 label_text = 'Desconhecido'
